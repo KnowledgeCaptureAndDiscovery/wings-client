@@ -1,9 +1,8 @@
+import json
 import os
 import re
-import json
-from .api_client import ApiClient
+
 import requests
-from urllib.parse import urlencode, quote_plus
 
 
 class ManageData(object):
@@ -30,7 +29,7 @@ class ManageData(object):
         dtype = self.get_type_id(dtype)
         postdata = {'parent_type': parent, 'data_type': dtype}
         resp = self.api_client.session.post(self.api_client.get_request_url() +
-                                 'data/newDataType', postdata)
+                                            'data/newDataType', postdata)
         self.api_client.check_request(resp)
         return dtype
 
@@ -44,21 +43,21 @@ class ManageData(object):
             data['add'][pid] = {'prop': pname, 'pid': pid, 'range': prange}
         postdata = {'data_type': dtype, 'props_json': json.dumps(data)}
         self.api_client.session.post(self.api_client.get_request_url() +
-                          'data/saveDataTypeJSON', postdata)
+                                     'data/saveDataTypeJSON', postdata)
 
     def add_data_for_type(self, dataid, dtype):
         dtype = self.get_type_id(dtype)
         dataid = self.get_data_id(dataid)
         postdata = {'data_id': dataid, 'data_type': dtype}
         resp = self.api_client.session.post(self.api_client.get_request_url() +
-                                 'data/addDataForType', postdata)
+                                            'data/addDataForType', postdata)
         self.api_client.check_request(resp)
 
     def del_data_type(self, dtype):
         dtype = self.get_type_id(dtype)
         postdata = {'data_type': json.dumps([dtype]), 'del_children': 'true'}
         self.api_client.session.post(self.api_client.get_request_url() +
-                          'data/delDataTypes', postdata)
+                                     'data/delDataTypes', postdata)
 
     def del_data(self, dataid):
         dataid = self.get_data_id(dataid)
@@ -95,7 +94,7 @@ class ManageData(object):
         files = {'file': (fname, open(filepath, 'rb'))}
         postdata = {'name': fname, 'type': 'data'}
         response = self.api_client.session.post(self.api_client.get_request_url() + 'upload',
-                                     data=postdata, files=files)
+                                                data=postdata, files=files)
         if response.status_code == 200:
             details = response.json()
             if details['success']:
@@ -108,16 +107,16 @@ class ManageData(object):
     def save_metadata(self, dataid, metadata):
         pvals = []
         for key in metadata:
-            if(metadata[key]):
+            if metadata[key]:
                 pvals.append(
                     {'name': self.api_client.dcdom + key, 'value': metadata[key]})
         postdata = {'propvals_json': json.dumps(
             pvals), 'data_id': self.get_data_id(dataid)}
         resp = self.api_client.session.post(self.api_client.get_request_url() +
-                                 'data/saveDataJSON', postdata)
+                                            'data/saveDataJSON', postdata)
         self.api_client.check_request(resp)
 
     def set_data_location(self, dataid, location):
         postdata = {'data_id': self.get_data_id(dataid), 'location': location}
         self.api_client.session.post(self.api_client.get_request_url() +
-                          'data/setDataLocation', postdata)
+                                     'data/setDataLocation', postdata)

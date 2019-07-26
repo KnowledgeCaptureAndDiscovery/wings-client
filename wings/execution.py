@@ -1,10 +1,4 @@
-import os
-
-import requests
-from math import ceil
 import json
-from .auth import Auth
-from .api_client import ApiClient
 
 
 class Execution(object):
@@ -19,12 +13,14 @@ class Execution(object):
         if status:
             params['status'] = status
 
-        resp = self.api_client.session.get(self.api_client.get_request_url() + 'executions/getRunListSimple', params=params)
+        resp = self.api_client.session.get(self.api_client.get_request_url() + 'executions/getRunListSimple',
+                                           params=params)
         return self.api_client.check_request(resp)
 
     def get_run_details(self, execution_id):
         postdata = {'run_id': execution_id}
-        resp = self.api_client.session.post(self.api_client.get_request_url() + 'executions/getRunDetails', data=postdata)
+        resp = self.api_client.session.post(self.api_client.get_request_url() + 'executions/getRunDetails',
+                                            data=postdata)
         return self.api_client.check_request(resp)
 
     def delete_run(self, execution_id):
@@ -33,7 +29,9 @@ class Execution(object):
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
         }
-        resp = self.api_client.session.post(self.api_client.get_request_url() + 'executions/deleteRun', data=postdata, headers=headers)
+        resp = self.api_client.session.post(self.api_client.get_request_url() + 'executions/deleteRun',
+                                            data=postdata,
+                                            headers=headers)
         return self.api_client.check_request(resp)
 
     def publish(self, execution_id):

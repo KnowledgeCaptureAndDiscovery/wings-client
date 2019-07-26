@@ -1,6 +1,5 @@
 import json
-import urllib
-from .auth import Auth
+from urllib.parse import urlencode
 
 
 class ManageResource(object):
@@ -10,7 +9,7 @@ class ManageResource(object):
     def get_machine(self, resid):
         params = {'resid': resid}
         resp = self.api_client.session.get(self.api_client.server + '/common/resources/getMachineJSON?' +
-                                urllib.urlencode(params))
+                                           urlencode(params))
         return resp.json()
 
     def save_machine(self, mid, machine_data):

@@ -1,7 +1,5 @@
-import os
-import re
 import json
-from .api_client import ApiClient
+import re
 
 
 class Planner(object):
@@ -11,14 +9,13 @@ class Planner(object):
         self.wflowns = self.api_client.get_export_url() + "workflows/" + template + ".owl#"
         self.wflowid = self.api_client.wflowns + template
 
-
-    def _set_bindings(self, invar, val, dataBindings, parameterBindings, parameterTypes):
+    def _set_bindings(self, invar, val, data_bindings, parameter_bindings, parameter_types):
         if isinstance(val, basestring) and val.startswith('file:'):
-            data = dataBindings.get(self.wflowns + invar, [])
+            data = data_bindings.get(self.wflowns + invar, [])
             data.append(self.api_client.libns + val[5:])
-            dataBindings[self.wflowns + invar] = data
+            data_bindings[self.wflowns + invar] = data
         else:
-            parameterBindings[self.wflowns + invar] = val
+            parameter_bindings[self.wflowns + invar] = val
             typeid = self.api_client.xsdns + "string"
             if type(val) is int:
                 typeid = self.api_client.xsdns + "integer"
@@ -26,27 +23,27 @@ class Planner(object):
                 typeid = self.api_client.xsdns + "float"
             elif type(val) is bool:
                 typeid = self.api_client.xsdns + "boolean"
-            parameterTypes[self.wflowns + invar] = typeid
+            parameter_types[self.wflowns + invar] = typeid
 
     def get_expansions(self, inputs):
         postdata = [('templateId', self.wflowid),
                     ('componentBindings', '{}'), ('parameterBindings', '{}')]
-        dataBindings = dict()
-        parameterBindings = dict()
-        parameterTypes = dict()
+        data_bindings = dict()
+        parameter_bindings = dict()
+        parameter_types = dict()
         for invar in inputs:
             if type(inputs[invar]) is list:
                 for val in inputs[invar]:
                     self._set_bindings(
-                        invar, val, dataBindings, parameterBindings, parameterTypes)
+                        invar, val, data_bindings, parameter_bindings, parameter_types)
             else:
                 self._set_bindings(
-                    invar, inputs[invar], dataBindings, parameterBindings, parameterTypes)
+                    invar, inputs[invar], data_bindings, parameter_bindings, parameter_types)
         postdata = {
             "templateId": self.wflowid,
-            "dataBindings": dataBindings,
-            "parameterBindings": parameterBindings,
-            "parameterTypes": parameterTypes,
+            "dataBindings": data_bindings,
+            "parameterBindings": parameter_bindings,
+            "parameter_types": parameter_types,
             "componentBindings": dict()
         }
         resp = self.api_client.session.post(
