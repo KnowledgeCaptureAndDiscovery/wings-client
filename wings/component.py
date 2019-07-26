@@ -1,8 +1,6 @@
+import json
 import os
 import re
-import json
-import requests
-from .api_client import ApiClient
 
 
 class ManageComponent(object):
@@ -14,12 +12,12 @@ class ManageComponent(object):
         if typeid == "":
             return self.api_client.topcls
         elif not re.match(r"(http:|https:)//", typeid):
-            return self.api_client.libns + typeid + "Class";
+            return self.api_client.libns + typeid + "Class"
         else:
-            return typeid + "Class";
+            return typeid + "Class"
 
     def get_component_id(self, compid):
-        if compid == None:
+        if compid is None:
             return ""
         elif not re.match(r"(http:|https:)//", compid):
             return self.api_client.libns + compid
@@ -29,11 +27,11 @@ class ManageComponent(object):
     def new_component_type(self, ctype, parent):
         ptype = self.get_component_id(parent)
         ctype = self.get_component_id(ctype)
-        pcls = self.get_type_id(ptype);
+        pcls = self.get_type_id(ptype)
         postdata = {'parent_cid': ptype, 'parent_type': pcls,
                     'cid': ctype, 'load_concrete': "false"}
         resp = self.api_client.session.post(self.api_client.get_request_url() +
-                          'components/type/addComponent', postdata)
+                                            'components/type/addComponent', postdata)
         self.api_client.check_request(resp)
 
     def new_component(self, cid, parent):
@@ -43,23 +41,22 @@ class ManageComponent(object):
         postdata = {'parent_cid': pid, 'parent_type': pcls,
                     'cid': cid, 'load_concrete': "true"}
         resp = self.api_client.session.post(self.api_client.get_request_url() +
-                          'components/addComponent', postdata)
+                                            'components/addComponent', postdata)
         self.api_client.check_request(resp)
 
     def del_component_type(self, ctype):
         ctype = self.get_component_id(ctype)
         postdata = {'cid': ctype}
         resp = self.api_client.session.post(self.api_client.get_request_url() +
-                          'components/type/delComponent', postdata)
+                                            'components/type/delComponent', postdata)
         self.api_client.check_request(resp)
 
     def del_component(self, cid):
         cid = self.get_component_id(cid)
         postdata = {'cid': cid}
         resp = self.api_client.session.post(self.api_client.get_request_url() +
-                          'components/delComponent', postdata)
+                                            'components/delComponent', postdata)
         self.api_client.check_request(resp)
-
 
     def get_all_items(self):
         resp = self.api_client.session.get(
@@ -78,7 +75,7 @@ class ManageComponent(object):
     def get_component_type_description(self, ctype):
         ctype = self.get_type_id(ctype)
         postdata = {'cid': ctype, 'load_concrete': False}
-        resp = self.session.get(
+        resp = self.api_client.session.get(
             self.api_client.get_request_url() + 'components/type/getComponentJSON', params=postdata)
         self.api_client.check_request(resp)
         return resp.json()
@@ -96,22 +93,22 @@ class ManageComponent(object):
         return jsonobj
 
     def save_component(self, cid, jsonobj):
-        cid = self.get_component_id(cid);
+        cid = self.get_component_id(cid)
         jsonobj = self._modify_component_json(cid, jsonobj)
         jsonobj["type"] = 2
         postdata = {'component_json': json.dumps(jsonobj), 'cid': cid}
         resp = self.api_client.session.post(self.api_client.get_request_url() +
-                          'components/saveComponentJSON', postdata)
+                                            'components/saveComponentJSON', postdata)
         self.api_client.check_request(resp)
 
     def save_component_type(self, ctype, jsonobj):
-        ctype = self.get_type_id(ctype);
+        ctype = self.get_type_id(ctype)
         jsonobj = self._modify_component_json(ctype, jsonobj)
         jsonobj["type"] = 1
         postdata = {'component_json': json.dumps(jsonobj), 'cid': ctype,
                     'load_concrete': False}
         self.api_client.session.post(self.api_client.get_request_url() +
-                          'components/type/saveComponentJSON', postdata)
+                                     'components/type/saveComponentJSON', postdata)
 
     def upload_component(self, filepath, cid):
         cid = self.get_component_id(cid)
@@ -131,7 +128,7 @@ class ManageComponent(object):
     def set_component_location(self, cid, location):
         postdata = {'cid': self.get_component_id(cid), 'location': location}
         self.api_client.session.post(self.api_client.get_request_url() +
-                          'components/setComponentLocation', postdata)
+                                     'components/setComponentLocation', postdata)
 
     def upload(self, filepath, cid):
         cid = self.get_component_id(cid)
@@ -139,7 +136,7 @@ class ManageComponent(object):
         files = {'file': (fname, open(filepath, 'rb'))}
         postdata = {'id': cid, 'name': fname, 'type': 'component'}
         response = self.api_client.session.post(self.api_client.get_request_url() + 'upload',
-                                     data=postdata, files=files)
+                                                data=postdata, files=files)
         if response.status_code == 200:
             details = response.json()
             print(details)
