@@ -1,8 +1,9 @@
 import os
-from .auth import Auth
 
 
-class ManageDomain(Auth):
+class ManageDomain(object):
+    def __init__(self, api_client):
+        self.api_client = api_client
 
     def import_domain(self, url):
         data = {'domain': os.path.basename(url), 'location': url}

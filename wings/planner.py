@@ -1,32 +1,31 @@
 import os
 import re
 import json
-from .userop import UserOperation
+from .api_client import ApiClient
 
 
-class Planner(UserOperation):
+class Planner(object):
 
-    def __init__(self, server, userid, domain, template):
-        super(Planner, self).__init__(server, userid, domain)
-        self.libns = self.get_export_url() + "data/library.owl#"
-        self.wflowns = self.get_export_url() + "workflows/" + template + ".owl#"
-        self.wflowid = self.wflowns + template
-        self.xsdns = "http://www.w3.org/2001/XMLSchema#"
+    def __init__(self, api_client, template):
+        self.api_client = api_client
+        self.wflowns = self.api_client.get_export_url() + "workflows/" + template + ".owl#"
+        self.wflowid = self.api_client.wflowns + template
+
 
     def _set_bindings(self, invar, val, dataBindings, parameterBindings, parameterTypes):
         if isinstance(val, basestring) and val.startswith('file:'):
             data = dataBindings.get(self.wflowns + invar, [])
-            data.append(self.libns + val[5:])
+            data.append(self.api_client.libns + val[5:])
             dataBindings[self.wflowns + invar] = data
         else:
             parameterBindings[self.wflowns + invar] = val
-            typeid = self.xsdns + "string"
+            typeid = self.api_client.xsdns + "string"
             if type(val) is int:
-                typeid = self.xsdns + "integer"
+                typeid = self.api_client.xsdns + "integer"
             elif type(val) is float:
-                typeid = self.xsdns + "float"
+                typeid = self.api_client.xsdns + "float"
             elif type(val) is bool:
-                typeid = self.xsdns + "boolean"
+                typeid = self.api_client.xsdns + "boolean"
             parameterTypes[self.wflowns + invar] = typeid
 
     def get_expansions(self, inputs):
@@ -50,8 +49,8 @@ class Planner(UserOperation):
             "parameterTypes": parameterTypes,
             "componentBindings": dict()
         }
-        resp = self.session.post(
-            self.get_request_url() + 'plan/getExpansions', json=postdata)
+        resp = self.api_client.session.post(
+            self.api_client.get_request_url() + 'plan/getExpansions', json=postdata)
         return resp.json()
 
     def select_template(self, templates):
@@ -105,7 +104,7 @@ class Planner(UserOperation):
             'seed_json': json.dumps(seed["template"]),
             'seed_constraints_json': json.dumps(seed["constraints"])
         }
-        resp = self.session.post(self.get_request_url(
+        resp = self.api_client.session.post(self.api_client.get_request_url(
         ) + 'executions/runWorkflow', data=postdata)
         regex = re.compile(r"^.*#")
         return regex.sub("", resp.text)

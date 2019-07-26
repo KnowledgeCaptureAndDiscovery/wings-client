@@ -9,8 +9,8 @@ README = (HERE / "README.md").read_text()
 
 # This call to setup() does all the work
 setup(
-    name="wings-client",
-    version="1.0.0",
+    name="wings",
+    version="1.1.0",
     description="Interact with a WINGS instance",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -29,7 +29,7 @@ setup(
         "Intended Audience :: Science/Research",
         "Operating System :: Unix",
     ],
-    packages=["wings-client"],
+    packages=["wings"],
     include_package_data=True,
-    install_requires=["feedparser", "html2text"],
+    install_requires=["certifi", "chardet", "idna", "requests", "urllib3"],
 )
