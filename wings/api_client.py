@@ -3,16 +3,6 @@ import requests
 from .auth import Auth
 
 
-def check_request(resp):
-    try:
-        resp.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        print(err)
-    except requests.exceptions.RequestException as err:
-        print(err)
-    return resp
-
-
 class ApiClient(Auth):
 
     def __init__(self, server, export_url, userid, domain):
@@ -29,3 +19,12 @@ class ApiClient(Auth):
 
     def get_export_url(self):
         return self.export_url + "/export/users/" + self.userid + "/" + self.domain + "/"
+
+    def check_request(self, resp):
+        try:
+            resp.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            raise requests.exceptions.HTTPError
+        except requests.exceptions.RequestException as err:
+            raise requests.exceptions.RequestException
+        return resp
