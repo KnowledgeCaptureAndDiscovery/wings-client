@@ -5,7 +5,7 @@ import re
 import requests
 
 
-class ManageData(object):
+class Data(object):
 
     def __init__(self, api_client):
         self.api_client = api_client
@@ -33,17 +33,48 @@ class ManageData(object):
         self.api_client.check_request(resp)
         return dtype
 
-    def add_type_properties(self, dtype, properties):
-        xsd = 'http://www.w3.org/2001/XMLSchema#'
+    def add_type_properties(self, dtype, properties=None, format=None):
+        if properties is None:
+            properties = {}
+        if not properties and not format:
+            raise ValueError("properties or format is required")
+
+        xsd = "http://www.w3.org/2001/XMLSchema#"
         dtype = self.get_type_id(dtype)
-        data = {'add': {}, 'del': {}, 'mod': {}}
-        for pname in properties:
-            pid = self.get_type_id(pname)
-            prange = xsd + properties[pname]
-            data['add'][pid] = {'prop': pname, 'pid': pid, 'range': prange}
-        postdata = {'data_type': dtype, 'props_json': json.dumps(data)}
-        self.api_client.session.post(self.api_client.get_request_url() +
-                                     'data/saveDataTypeJSON', postdata)
+        data = {"add": {}, "del": {}, "mod": {}}
+
+        if format:
+            data["format"] = format
+
+        if properties is not None:
+            cp = self.get_datatype_description(dtype)
+            np = {}
+            for c in cp["properties"]:
+                np[c["id"].split("#")[-1]] = c["range"].split("#")[-1]
+
+            for pname, ptype in properties.items():
+                if pname not in np:
+                    pid = self.get_type_id(pname)
+                    prange = xsd + ptype
+                    data["add"][pid] = {"prop": pname, "pid": pid, "range": prange}
+
+            for pname, ptype in properties.items():
+                if pname in np:
+                    pid = self.get_type_id(pname)
+                    prange = xsd + ptype
+                    data["mod"][pid] = {"prop": pname, "pid": pid, "range": prange}
+
+            for pname, ptype in np.items():
+                if pname not in properties:
+                    pid = self.get_type_id(pname)
+                    prange = xsd + ptype
+                    data["del"][pid] = {"prop": pname, "pid": pid, "range": prange}
+
+        postdata = {"data_type": dtype, "props_json": json.dumps(data)}
+        resp = self.api_client.session.post(
+            self.api_client.get_request_url() + "data/saveDataTypeJSON", postdata
+        )
+        self.api_client.check_request(resp)
 
     def add_data_for_type(self, dataid, dtype):
         dtype = self.get_type_id(dtype)
@@ -83,6 +114,7 @@ class ManageData(object):
             resp = self.api_client.session.get(
                 self.api_client.get_request_url() + 'data/getDataTypeJSON', params=params)
             resp.raise_for_status()
+            return resp.json()
         except requests.exceptions.HTTPError as err:
             print(err)
         except requests.exceptions.RequestException as err:

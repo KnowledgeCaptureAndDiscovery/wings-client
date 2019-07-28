@@ -3,8 +3,7 @@ import os
 import re
 
 
-class ManageComponent(object):
-
+class Component(object):
     def __init__(self, api_client):
         self.api_client = api_client
 

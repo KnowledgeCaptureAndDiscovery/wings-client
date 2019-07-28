@@ -2,10 +2,11 @@ import json
 
 
 class Execution(object):
+
     def __init__(self, api_client):
         self.api_client = api_client
 
-    def list_executions_by_page(self, page, pattern=None, status=None, limit=1000):
+    def list_executions_by_page(self, page=0, pattern=None, status=None, limit=1000):
         start = limit*page
         params = {"start": start, "limit": limit}
         if pattern:

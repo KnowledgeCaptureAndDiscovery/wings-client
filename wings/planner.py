@@ -4,10 +4,12 @@ import re
 
 class Planner(object):
 
-    def __init__(self, api_client, template):
+    def __init__(self, api_client):
         self.api_client = api_client
+
+    def set_template(self, template):
         self.wflowns = self.api_client.get_export_url() + "workflows/" + template + ".owl#"
-        self.wflowid = self.api_client.wflowns + template
+        self.wflowid = self.wflowns + template
 
     def _set_bindings(self, invar, val, data_bindings, parameter_bindings, parameter_types):
         if isinstance(val, basestring) and val.startswith('file:'):
@@ -58,7 +60,7 @@ class Planner(object):
         num = len(templates)
         for tpl in templates:
             print("%s. %s" %
-                  (i, self.get_template_description(tpl['template'])))
+                  (i, self.api_client.get_template_description(tpl['template'])))
             i += 1
         index = 0
         while True:
