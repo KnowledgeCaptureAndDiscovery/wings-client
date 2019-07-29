@@ -4,7 +4,7 @@ import logging
 import requests
 
 
-class ApiClient(dict):
+class ApiClient:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         self.session = requests.Session()
@@ -13,7 +13,9 @@ class ApiClient(dict):
         self.dclib = self.get_export_url() + "data/library.owl#"
         self.xsdns = "http://www.w3.org/2001/XMLSchema#"
         self.topcls = "http://www.wings-workflows.org/ontology/component.owl#Component"
-        self._instances = {}
+
+        if self.login(kwargs["password"]) is False:
+            raise ValueError("Login failed")
 
     def get_server(self):
         return self.server
@@ -22,15 +24,15 @@ class ApiClient(dict):
         return self.username
 
     def login(self, password):
-        self.session.get(self.server + '/sparql')
-        data = {'j_username': self.username, 'j_password': password}
-        response = self.session.post(self.server + '/j_security_check', data)
+        self.session.get(self.server + "/sparql")
+        data = {"j_username": self.username, "j_password": password}
+        response = self.session.post(self.server + "/j_security_check", data)
         if response.status_code != 200 and response.status_code != 403:
             return False
         return True
 
     def logout(self):
-        self.session.get(self.server + '/jsp/logout.jsp')
+        self.session.get(self.server + "/jsp/logout.jsp")
 
     def session(self):
         return self.session
@@ -42,17 +44,15 @@ class ApiClient(dict):
                 class_ = getattr(module_, name.title())
                 return class_(api_client=self)
             except AttributeError:
-                logging.error('Class does not exist')
+                logging.error("Class does not exist")
         except ImportError:
-            logging.error('Module does not exist %s', name)
+            logging.error("Module does not exist %s", name)
 
     def close(self):
         """
         Shutdown sessions across all instantiated services
         """
-        for name in self._instances:
-            getattr(self, name).shutdown()
-            setattr(self, name, None)
+        self.logout()
 
     def __getattr__(self, attr):
         try:
@@ -66,7 +66,9 @@ class ApiClient(dict):
         return self.server + "/users/" + self.username + "/" + self.domain + "/"
 
     def get_export_url(self):
-        return self.export_url + "/export/users/" + self.username + "/" + self.domain + "/"
+        return (
+            self.export_url + "/export/users/" + self.username + "/" + self.domain + "/"
+        )
 
     @staticmethod
     def check_request(resp):
