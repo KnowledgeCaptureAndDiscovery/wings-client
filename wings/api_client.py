@@ -1,3 +1,4 @@
+import atexit
 import importlib
 import logging
 
@@ -17,6 +18,8 @@ class ApiClient:
         if self.login(kwargs["password"]) is False:
             raise ValueError("Login failed")
 
+        atexit.register(self.logout)
+
     def get_server(self):
         return self.server
 
@@ -32,7 +35,8 @@ class ApiClient:
         return True
 
     def logout(self):
-        self.session.get(self.server + "/jsp/logout.jsp")
+        self.session.get(self.server + "/jsp/login/logout.jsp")
+        self.session.close()
 
     def session(self):
         return self.session
