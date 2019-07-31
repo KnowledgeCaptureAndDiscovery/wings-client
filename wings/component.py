@@ -109,6 +109,18 @@ class Component(object):
         self.api_client.session.post(self.api_client.get_request_url() +
                                      'components/type/saveComponentJSON', postdata)
 
+    def download_component(self, cid, dir_path):
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        file_path = "{}.zip".format(os.path.join(dir_path, cid))
+        cid = self.get_component_id(cid)
+        params = {'cid': cid}
+        r = self.api_client.session.get(self.api_client.get_request_url() +
+                            'components/fetch', params=params)
+        with open(file_path, 'wb') as f:
+            f.write(r.content)
+        return file_path
+
     def upload_component(self, filepath, cid):
         cid = self.get_component_id(cid)
         fname = os.path.basename(filepath)
