@@ -58,17 +58,10 @@ class Data(object):
                     prange = xsd + ptype
                     data["add"][pid] = {"prop": pname, "pid": pid, "range": prange}
 
-            for pname, ptype in properties.items():
                 if pname in np:
                     pid = self.get_type_id(pname)
                     prange = xsd + ptype
                     data["mod"][pid] = {"prop": pname, "pid": pid, "range": prange}
-
-            for pname, ptype in np.items():
-                if pname not in properties:
-                    pid = self.get_type_id(pname)
-                    prange = xsd + ptype
-                    data["del"][pid] = {"prop": pname, "pid": pid, "range": prange}
 
         postdata = {"data_type": dtype, "props_json": json.dumps(data)}
         resp = self.api_client.session.post(

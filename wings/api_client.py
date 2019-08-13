@@ -15,7 +15,7 @@ class ApiClient:
         self.xsdns = "http://www.w3.org/2001/XMLSchema#"
         self.topcls = "http://www.wings-workflows.org/ontology/component.owl#Component"
 
-        if self.login(kwargs["password"]) is False:
+        if self.login(kwargs["password"]) is True:
             raise ValueError("Login failed")
 
         atexit.register(self.logout)
