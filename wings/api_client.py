@@ -15,7 +15,7 @@ class ApiClient:
         self.xsdns = "http://www.w3.org/2001/XMLSchema#"
         self.topcls = "http://www.wings-workflows.org/ontology/component.owl#Component"
 
-        if self.login(kwargs["password"]) is True:
+        if self.login(kwargs["password"]) is False:
             raise ValueError("Login failed")
 
         atexit.register(self.logout)
@@ -26,7 +26,6 @@ class ApiClient:
     def get_username(self):
         return self.username
 
-    #WARNING: If the credentials are correct, Wings returns 403 :o 
     def login(self, password):
         self.session.get(self.server + "/sparql")
         data = {"j_username": self.username, "j_password": password}
