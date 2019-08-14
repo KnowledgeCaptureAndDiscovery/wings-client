@@ -30,7 +30,7 @@ class ApiClient:
         self.session.get(self.server + "/sparql")
         data = {"j_username": self.username, "j_password": password}
         response = self.session.post(self.server + "/j_security_check", data)
-        if response.status_code == 403:
+        if response.status_code == 403 or response.status_code == 200:
             return True
         return False
 
