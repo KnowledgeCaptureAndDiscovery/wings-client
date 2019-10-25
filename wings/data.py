@@ -77,6 +77,13 @@ class Data(object):
                                             'data/addDataForType', postdata)
         self.api_client.check_request(resp)
 
+    def add_remote_data_for_type(self, dataurl, dtype):
+        dtype = self.get_type_id(dtype)
+        postdata = {'data_url': dataurl, 'data_type': dtype}
+        resp = self.api_client.session.post(self.api_client.get_request_url() +
+                                            'data/addRemoteDataForType', postdata)
+        self.api_client.check_request(resp)
+
     def del_data_type(self, dtype):
         dtype = self.get_type_id(dtype)
         postdata = {'data_type': json.dumps([dtype]), 'del_children': 'true'}
