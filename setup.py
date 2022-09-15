@@ -10,13 +10,13 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="wings",
-    version="1.3.7_1",
+    version="1.3.8",
     description="Interact with a WINGS instance",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/KnowledgeCaptureAndDiscovery/wings-client",
-    author="Maximiliano Osorio",
-    author_email="mosorio@isi.edu",
+    author="Maximiliano Osorio, Varun Ratnakar",
+    author_email="mosorio@isi.edu, varunr@isi.edu",
     license="Apache-2",
     classifiers=[
         "License :: OSI Approved :: Apache Software License",

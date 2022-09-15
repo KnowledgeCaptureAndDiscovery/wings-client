@@ -12,12 +12,14 @@ class Planner(object):
         self.wflowid = self.wflowns + template
 
     def _set_bindings(self, invar, val, data_bindings, parameter_bindings, parameter_types):
-        if isinstance(val, basestring) and val.startswith('file:'):
+        if isinstance(val, str) and val.startswith('file:'):
             data = data_bindings.get(self.wflowns + invar, [])
-            data.append(self.api_client.libns + val[5:])
+            data.append(self.api_client.dclib + val[5:])
             data_bindings[self.wflowns + invar] = data
         else:
-            parameter_bindings[self.wflowns + invar] = val
+            parameters = parameter_bindings.get(self.wflowns + invar, [])
+            parameters.append(val)
+            parameter_bindings[self.wflowns + invar] = parameters
             typeid = self.api_client.xsdns + "string"
             if type(val) is int:
                 typeid = self.api_client.xsdns + "integer"
@@ -45,12 +47,17 @@ class Planner(object):
             "templateId": self.wflowid,
             "dataBindings": data_bindings,
             "parameterBindings": parameter_bindings,
-            "parameter_types": parameter_types,
+            "parameterTypes": parameter_types,
             "componentBindings": dict()
         }
         resp = self.api_client.session.post(
             self.api_client.get_request_url() + 'plan/getExpansions', json=postdata)
-        return resp.json()
+
+        if resp.status_code == 200:
+            return resp.json()
+        else:
+            print(resp.text)
+            return None
 
     def select_template(self, templates):
         from sys import version_info

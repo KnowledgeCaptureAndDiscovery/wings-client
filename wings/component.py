@@ -141,6 +141,10 @@ class Component(object):
         self.api_client.session.post(self.api_client.get_request_url() +
                                      'components/setComponentLocation', postdata)
 
+    def increment_versions_clear_cache(self):
+        self.api_client.session.get(self.api_client.get_request_url() +
+                                     'components/incrementComponentVersions')
+
     def upload(self, filepath, cid):
         cid = self.get_component_id(cid)
         fname = os.path.basename(filepath)
