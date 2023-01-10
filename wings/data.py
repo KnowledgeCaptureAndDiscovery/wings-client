@@ -152,3 +152,12 @@ class Data(object):
         postdata = {'data_id': self.get_data_id(dataid), 'location': location}
         self.api_client.session.post(self.api_client.get_request_url() +
                                      'data/setDataLocation', postdata)
+
+    def fetch_data(self, dataid, location):
+        dataid = self.get_data_id(dataid)
+        params = {'data_id': dataid}
+        resp = self.api_client.session.get(self.api_client.get_request_url() +
+                                            'data/fetch', params=params)
+        fd = open(location, 'wb')
+        fd.write(resp.content)
+        fd.close()
