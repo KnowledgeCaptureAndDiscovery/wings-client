@@ -1,13 +1,10 @@
 [tool.poetry]
-name = "wings-client"
+name = "wings"
 version = "1.4.0"
 description = "Interact with a WINGS instance"
 authors = ["Maximiliano Osorio <maxiosorio@gmail.com>", "Varun Ratnakar <varunr@isi.edu"]
 license = "Apache-2"
 readme = "README.md"
-packages = [
-    { include = "wings" },
-]
 
 [tool.poetry.dependencies]
 python = "^3.7"
